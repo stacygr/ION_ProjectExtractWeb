@@ -1,0 +1,29 @@
+﻿@page "/Connect-FileTemplates"
+
+<Processor 
+    PageTitle="Connect - File Templates"
+    GitHubPath="ION_Connect_FileTemplates/"
+    GitHubOwner="gregstacy"
+    NotSelected="NotSelected"
+    GetJson="GetJson">
+</Processor>
+
+
+@code
+{
+    private string? processMessage { get; set; } = string.Empty;
+    private List<Connect_FileFormatTemplatesModel>? items;
+    private List<MultipleSelectorModel> NotSelected = new List<MultipleSelectorModel>();
+    private Func<string, Task<string>> GetJson = Connect_FileFormatTemplateProcessor.GetJson;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await Connect_FileFormatTemplateProcessor.GetInfo();
+
+        if (items.Count > 0 && items[0].Name != null)
+        {
+            NotSelected = items.Select(x => new MultipleSelectorModel("name", x.Name.ToString())).ToList();
+        }
+    }
+}

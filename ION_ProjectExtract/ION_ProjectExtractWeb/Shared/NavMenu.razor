@@ -1,0 +1,166 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href=""> ION To GitHub Tool</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" href="" @onclick="ToggleCloseNavMenu">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+            <div class="nav-subItem px-3">
+
+            </div>
+        </div>
+
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" href="" @onclick="ToggleConnectNavMenu">
+                <span class="oi oi-transfer" aria-hidden="true"></span> Connect
+            </NavLink>
+            <div class="nav-subItem px-3">
+                @if (expandConnectSubMenu)
+                {
+                    <NavLink class="nav-link" href="Connect-DataFlows">
+                        <span class="oi" aria-hidden="true"></span> Data Flows
+                    </NavLink>
+                    <NavLink class="nav-link" href="Connect-ConnectionPoints">
+                        <span class="oi" aria-hidden="true"></span> Connection Points
+                    </NavLink>
+                    <NavLink class="nav-link" href="Connect-Mappings">
+                        <span class="oi" aria-hidden="true"></span> Mappings
+                    </NavLink>
+                    <NavLink class="nav-link" href="Connect-FileTemplates">
+                        <span class="oi" aria-hidden="true"></span> File Templates
+                    </NavLink>
+                }
+
+            </div>
+        </div>
+
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" href="" @onclick="ToggleMonitorsAndWorkflowsNavMenu">
+                <span class="oi oi-transfer" aria-hidden="true"></span> Monitors & Workflows
+            </NavLink>
+            <div class="nav-subItem px-3">
+                @if (expandMonitorsAndWorkflowsSubMenu)
+                {
+                    <NavLink class="nav-link" href="MonitorsAndWorkflows-Monitors">
+                        <span class="oi" aria-hidden="true"></span> Monitors
+                    </NavLink>
+                    <NavLink class="nav-link" href="MonitorsAndWorkflows-AlarmTemplates">
+                        <span class="oi" aria-hidden="true"></span> Alarm Templates
+                    </NavLink>
+                    <NavLink class="nav-link" href="MonitorsAndWorkflows-Workflows">
+                        <span class="oi" aria-hidden="true"></span> Workflows
+                    </NavLink>
+                    <NavLink class="nav-link" href="MonitorsAndWorkflows-ActivationPolicies">
+                        <span class="oi" aria-hidden="true"></span> Activation Policies
+                    </NavLink>
+                }
+
+            </div>
+        </div>
+
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" href="" @onclick="ToggleScriptingNavMenu">
+                <span class="oi oi-document" aria-hidden="true"></span> Scripting
+            </NavLink>
+            <div class="nav-subItem px-3">
+                @if (expandScriptingSubMenu)
+                {
+                    <NavLink class="nav-link" href="Scripting-Scripts">
+                        <span class="oi" aria-hidden="true"></span> Scripts
+                    </NavLink>
+                    <NavLink class="nav-link" href="Scripting-Libraries">
+                        <span class="oi" aria-hidden="true"></span> Libraries
+                    </NavLink>
+                }
+            </div>
+        </div>
+
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" href="" @onclick="ToggleDataCatalogNavMenu">
+                <span class="oi oi-document" aria-hidden="true"></span> Data Catalog
+            </NavLink>
+            <div class="nav-subItem px-3">
+                @if (expandDataCatalogSubMenu)
+                {
+                    <NavLink class="nav-link" href="DataCatalog-ObjectSchemas">
+                        <span class="oi" aria-hidden="true"></span> Object Schemas
+                    </NavLink>
+                    <NavLink class="nav-link" href="DataCatalog-DataLakeViews">
+                        <span class="oi" aria-hidden="true"></span> Data Lake Views
+                    </NavLink>
+                    <NavLink class="nav-link" href="DataCatalog-SchemaExtensions">
+                        <span class="oi" aria-hidden="true"></span> Schema Extensions
+                    </NavLink>
+                    <NavLink class="nav-link" href="DataCatalog-LocaleSelections">
+                        <span class="oi" aria-hidden="true"></span> Locale Selections
+                    </NavLink>
+                }
+            </div>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private bool expandConnectSubMenu;
+    private bool expandMonitorsAndWorkflowsSubMenu;
+    private bool expandDataCatalogSubMenu;
+    private bool expandScriptingSubMenu;
+    private bool expandHomeSubMenu;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void ToggleCloseNavMenu()
+    {
+        expandHomeSubMenu = !expandHomeSubMenu;
+        expandConnectSubMenu = false;
+        expandMonitorsAndWorkflowsSubMenu = false;
+        expandDataCatalogSubMenu = false;
+        expandScriptingSubMenu = false;
+    }
+
+    private void ToggleConnectNavMenu()
+    {
+        expandConnectSubMenu = !expandConnectSubMenu;
+        expandMonitorsAndWorkflowsSubMenu = false;
+        expandDataCatalogSubMenu = false;
+        expandScriptingSubMenu = false;
+    }
+
+    private void ToggleMonitorsAndWorkflowsNavMenu()
+    {
+        expandConnectSubMenu = false;
+        expandMonitorsAndWorkflowsSubMenu = !expandMonitorsAndWorkflowsSubMenu;
+        expandDataCatalogSubMenu = false;
+        expandScriptingSubMenu = false;
+    }
+
+    private void ToggleDataCatalogNavMenu()
+    {
+        expandConnectSubMenu = false;
+        expandMonitorsAndWorkflowsSubMenu = false;
+        expandDataCatalogSubMenu = !expandDataCatalogSubMenu;
+        expandScriptingSubMenu = false;
+    }
+
+    private void ToggleScriptingNavMenu()
+    {
+        expandConnectSubMenu = false;
+        expandMonitorsAndWorkflowsSubMenu = false;
+        expandDataCatalogSubMenu = false;
+        expandScriptingSubMenu = !expandScriptingSubMenu;
+    }
+}

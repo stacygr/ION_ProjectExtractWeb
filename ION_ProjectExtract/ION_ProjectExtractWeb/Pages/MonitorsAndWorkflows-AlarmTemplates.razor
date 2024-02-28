@@ -1,0 +1,28 @@
+﻿@page "/MonitorsAndWorkflows-AlarmTemplates"
+
+<Processor PageTitle="Monitors & Workflows - Alarm Templates"
+           GitHubPath="ION_Monitor&Workflows_AlarmTemplates/"
+           GitHubOwner="gregstacy"
+           NotSelected="NotSelected"
+          GetJson="GetJson">
+</Processor>
+
+
+@code
+{
+    private string? processMessage { get; set; } = string.Empty;
+    private List<Process_AlarmTemplateModel>? items;
+    private List<MultipleSelectorModel> NotSelected = new List<MultipleSelectorModel>();
+    private Func<string, Task<string>> GetJson = Process_AlarmTemplateProcessor.GetJson;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await Process_AlarmTemplateProcessor.GetInfo();
+
+        if (items.Count > 0 && items[0].Name != null)
+        {
+            NotSelected = items.Select(x => new MultipleSelectorModel("name", x.Name.ToString())).ToList();
+        }
+    }
+}

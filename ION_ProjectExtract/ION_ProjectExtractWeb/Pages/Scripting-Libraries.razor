@@ -1,0 +1,29 @@
+﻿@page "/Scripting-Libraries"
+
+<Processor 
+    PageTitle="Scripting - Libraries"
+    GitHubPath="ION_Scripting_Libraries/"
+    GitHubOwner="gregstacy"
+    NotSelected="NotSelected"
+    GetJson="GetJson">
+</Processor>
+
+
+@code
+{
+    private string? processMessage { get; set; } = string.Empty;
+    private List<Scripting_LibraryModel>? items;
+    private List<MultipleSelectorModel> NotSelected = new List<MultipleSelectorModel>();
+    private Func<string, Task<string>> GetJson = Scripting_LibraryProcessor.GetJson;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await Scripting_LibraryProcessor.GetInfo();
+
+        if (items.Count > 0 && items[0].Name != null)
+        {
+            NotSelected = items.Select(x => new MultipleSelectorModel("name", x.Name.ToString())).ToList();
+        }
+    }
+}

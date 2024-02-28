@@ -1,0 +1,35 @@
+﻿@inject RealTimeService service
+@inherits LayoutComponentBase
+
+<PageTitle>ION_ProdjectExtractWeb</PageTitle>
+
+<div class="page" style="background-color:lightgray">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <article class="content px-4">
+            @Body
+
+        </article>
+        <footer>
+            <div style="margin-right:250px">
+                @service.uiMessage
+            </div>
+            <div style="margin-right:250px">
+                Copyright &copy @DateTime.Now.Year John Bean Technologies
+            </div>
+        </footer>
+    </main>
+</div>
+
+
+@code
+{
+
+    protected override async Task OnInitializedAsync()
+    {
+        service.UpdateEvent += async () => await InvokeAsync(() => this.StateHasChanged());
+    }
+}

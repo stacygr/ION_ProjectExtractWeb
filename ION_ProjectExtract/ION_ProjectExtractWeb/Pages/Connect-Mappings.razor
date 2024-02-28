@@ -1,0 +1,29 @@
+﻿@page "/Connect-Mappings"
+
+<Processor 
+    PageTitle="Connect - Mappings"
+    GitHubPath="ION_Connect_Mappings/"
+    GitHubOwner="gregstacy"
+    NotSelected="NotSelected"
+    GetJson="GetJson">
+</Processor>
+
+
+@code
+{
+    private string? processMessage { get; set; } = string.Empty;
+    private List<Connect_MappingModel>? items;
+    private List<MultipleSelectorModel> NotSelected = new List<MultipleSelectorModel>();
+    private Func<string, Task<string>> GetJson = Connect_MappingProcesser.GetJson;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await Connect_MappingProcesser.GetInfo();
+
+        if (items.Count > 0 && items[0].Name != null)
+        {
+            NotSelected = items.Select(x => new MultipleSelectorModel("name", x.Name.ToString())).ToList();
+        }
+    }
+}

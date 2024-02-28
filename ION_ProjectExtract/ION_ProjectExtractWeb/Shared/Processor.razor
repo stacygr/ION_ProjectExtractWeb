@@ -1,0 +1,184 @@
+﻿@inject RealTimeService service
+
+<PageTitle>@PageTitle</PageTitle>
+
+
+<div class="PageTopBar">
+    <h1>@PageTitle</h1>
+</div>
+
+<br />
+
+<div class="GroupBox">
+    <header>
+        <h4>ION</h4>
+    </header>
+
+    <content>
+        <MultipleSelector Selected="Selected" NoSelected="NotSelected"></MultipleSelector>
+    </content>
+</div>
+
+<br />
+
+<div class="GroupBox">
+    <header>
+        <h4>Git Hub</h4>
+    </header>
+    <div class="GroupBox-content">
+        <div>
+            <b>Repository</b>
+        </div>
+        <select @onchange="RepoSelect">
+            <option disabled selected value> -- select a repository -- </option>
+            @if (gitHubRepos != null)
+            {
+                @foreach (var repo in gitHubRepos)
+                {
+                    <option>@repo.Name</option>
+                }
+            }
+        </select>
+
+        <br />
+        <br />
+
+        <div>
+            <b>Branch</b>
+        </div>
+        <select @bind="selectedBranch">
+            <option disabled selected value> -- select a branch -- </option>
+            @if (gitHubBranches != null)
+            {
+                @foreach (var branch in gitHubBranches)
+                {
+                    <option>@branch.Name</option>
+                }
+            }
+        </select>
+
+        <br />
+        <br />
+        <br />
+
+        <div>
+            <button type="button" @onclick="Process">Commit To GitHub</button>
+        </div>
+    </div>
+</div>
+<div style="margin-bottom:75px"></div>
+
+<ErrorBox @ref="errorBox"></ErrorBox>
+
+
+@code
+{
+    [Parameter] public string? PageTitle { get; set; }
+    [Parameter] public string? GitHubPath { get; set; }
+    [Parameter] public string? GitHubOwner { get; set; }
+    [Parameter] public List<MultipleSelectorModel>? NotSelected { get; set; }
+    [Parameter] public Func<string, Task<string>>? GetJson { get; set; }
+
+    protected ErrorBox? errorBox { get; set; }
+
+    private List<MultipleSelectorModel> Selected = new List<MultipleSelectorModel>();
+    private List<MultipleSelectorModel> TempSelect = new List<MultipleSelectorModel>();
+    private List<GitHubRepoModel>? gitHubRepos;
+    private List<GitHubBranchModel>? gitHubBranches;
+
+    private string? selectedRepo;
+    private string? selectedBranch { get; set; }
+    private string? content;
+    private string? path;
+    private string? message;
+    private bool processRequest = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        service.UpdateEvent += async () => await InvokeAsync(() => this.StateHasChanged());
+        service.uiMessage = string.Empty;
+        gitHubRepos = await GitHub_RepositoryProcessor.GetInfo();
+    }
+
+
+    private async Task RepoSelect(ChangeEventArgs e)
+    {
+        gitHubBranches = null;
+
+        if (e.Value != null)
+        {
+            selectedRepo = e.Value.ToString();
+        }
+
+        if (selectedRepo != null)
+        {
+            gitHubBranches = await GitHub_RepositoryProcessor.GetBranches(GitHubOwner, selectedRepo);
+        }
+    }
+
+    private async void GetBranches()
+    {
+        if (selectedRepo != null)
+        {
+            gitHubBranches = await GitHub_RepositoryProcessor.GetBranches(GitHubOwner, selectedRepo);
+        }
+    }
+
+    private async Task Process()
+    {
+        processRequest = true;
+        if (Selected.Count == 0)
+        {
+            processRequest = false;
+
+        }
+
+        if (selectedRepo == null)
+        {
+            processRequest = false;
+        }
+
+        if (selectedBranch == null)
+        {
+            processRequest = false;
+        }
+
+        if (processRequest)
+        {
+            for (int i = 0; i < Selected.Count(); i++)
+            {
+                if (GetJson != null)
+                {
+                    content = await GetJson(Selected[i].Value);
+                }
+
+                path = GitHubPath + Selected[i].Value + ".JSON";
+                message = Selected[i].Value + " was loaded using JBT web tool";
+
+                service.uiMessage = "Committing " + Selected[i].Value + " to GitHub " + selectedRepo + " branch " + selectedBranch;
+
+                if (selectedRepo != null && selectedBranch != null)
+                {
+                    var response = await GitHub_RepositoryProcessor.CreateOrUpdateFiles(GitHubOwner, selectedRepo, path, message, content, selectedBranch);
+                    TempSelect.Add(Selected[i]);
+                    MultipleSelector.ReferenceEquals(Selected, NotSelected);
+                }
+            }
+
+            for (int i = 0; i < TempSelect.Count(); i++)
+            {
+                NotSelected.Add(TempSelect[i]);
+
+            }
+            Selected.Clear();
+            service.uiMessage = string.Empty;
+        }
+        else
+        {
+            if(errorBox != null)
+            {
+                errorBox.Show("Check that all form fields are filled out!");
+            }
+        }
+    }
+}
